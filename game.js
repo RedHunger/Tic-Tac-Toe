@@ -13,16 +13,20 @@
 			vm.options.container = {};
 		};
 		createGameOptions();
+		this.changeTurnStatusInfo = function () {
+                this.options.turnStatusInfo.innerHTML = 'Player ' + vm.options.playerStep + ' turn'
+
+            }
         this.restart = function () {
             document.body.innerHTML = '';
             createGameOptions();
             vm.createStartScreen();
         };
-        debugger;
         this.start = function() {
             vm.options.playerStep = 1;
             var target = document.getElementById("numberOfCellsId");
             vm.options.startScreen.selectedCells =  target.options[target.selectedIndex].value;
+            vm.options.startScreen.selectedWin = +(document.getElementById("numberToWinId").options[document.getElementById("numberToWinId").selectedIndex].value);
             document.body.innerHTML = '';
             vm.fieldCreate();
 
@@ -56,6 +60,7 @@
                 }
                 this.gameField.push(line);
             }
+			vm.options.globalWin = this.options.startScreen.numberToWin;
             var restartButton = this.elementFactory(document.body,'button');
             restartButton.innerHTML = 'Restart';
             restartButton.onclick = this.restart;
@@ -63,6 +68,7 @@
             this.options.turnStatusInfo = this.elementFactory(document.body,'h3');
             this.options.turnStatusInfo.style.color = 'red';
             this.options.turnStatusInfo.innerHTML = 'Player ' + vm.options.playerStep + ' turn'
+
         };
 
         this.createStartScreen = function(){
@@ -87,7 +93,8 @@
             for (var count = 3; count <= 6; count++){
             	var optionElementcount = this.elementFactory(this.options.startScreen.numberToWin,'option');
 				optionElementcount.value = count;
-                optionElementcount.text = count;
+                optionElementcount.text = count;  
+
             }
             var spanGrid = this.elementFactory(document.body,'span');
             document.body.appendChild(this.options.startScreen.numberOfCells);
@@ -96,8 +103,11 @@
             spanGrid.innerHTML="Grid : ";
             spaTowin.innerHTML="To win for : ";
             var startButton = this.elementFactory(document.body,'button');
-            startButton.innerHTML = 'Start game';
+            startButton.innerHTML = 'Let\'s GO!';
             startButton.onclick = this.start;
+			
+
+           
         };
         this.setStyleForBlock = function (block, cells) {
 
@@ -108,7 +118,110 @@
             block.style.display = 'inline-block';
             block.style.fontSize = cells* 50 / cells + 'px';
         };
-        this.createStartScreen();   
+        this.createStartScreen();
+        this.checkVertical = function (player) {
+            var count = 0;
+            debugger;
+            for(var i = 0; i <= vm.options.startScreen.selectedCells-1; i++){
+                vm.gameField.forEach(function (item) {
+                    if(item[i].value == player){
+                        count++
+                    }
+                });
+                if(count == vm.options.startScreen.selectedWin){
+
+                    vm.result = player;
+                    break;
+                }
+                count = 0;
+            }
+
+
+        };
+        this.checkHorizontal = function (player) {
+        	 debugger;
+                var count = 0;
+                var prevItem ;
+                for(var i = 0; i <= vm.gameField.length - 1; i++){
+                    vm.gameField[i].forEach(function (item,i,arr) {
+                    	
+
+                    	if (i == 0){
+                    		prevItem = vm.gameField[i].value;
+                    	}
+                        if(item.value == player | prevItem == player) {
+                            count++
+                        }
+                    });
+                    if(count == vm.options.startScreen.selectedWin){
+
+                        vm.result = player;
+                        break;
+                    }
+                    count = 0;
+                }
+
+            };
+        this.checkRightDiagonal = function (player) {
+                var rightDiagonalCount = 0;
+                var rightDiagonal =[];
+                for(var i = 0;i<=vm.gameField.length - 1; i++){
+                    rightDiagonal.push(vm.gameField[i].slice());
+                    rightDiagonal[i].reverse();
+                    if(rightDiagonal[i][i].value == player){
+                        rightDiagonalCount++
+                    }
+                    if(rightDiagonalCount == vm.options.startScreen.selectedWin){
+
+                        vm.result = player;
+                        rightDiagonalCount = 0;
+                        break;
+                    }
+                }
+            };
+		this.checkLeftDiagonal = function(player) {
+			var leftDiagonalCount = 0;
+			var leftDiagonal = vm.gameField;
+
+			for (var i = 0; i <= leftDiagonal.length - 1; i++) {
+				if (leftDiagonal[i][i].value == player) {
+					leftDiagonalCount++
+				}
+				if (leftDiagonalCount == vm.options.startScreen.selectedWin) {
+
+					vm.result = player;
+					leftDiagonalCount = 0;
+					break;
+				}
+			}
+		};
+
+		this.showResult = function (winner) {
+                alert(winner+"-Player WON!");
+                // this.restart();
+        };	
+        this.checkGame = function () {
+        	debugger;
+            if(this.options.stepCounter >= vm.options.startScreen.selectedWin){
+                this.checkHorizontal('x');
+                this.checkHorizontal('o');
+                this.checkVertical('x');
+                this.checkVertical('o');
+                this.checkLeftDiagonal('x');
+                this.checkLeftDiagonal('o');
+                this.checkRightDiagonal('x');
+                this.checkRightDiagonal('o');
+            }
+            if( (this.options.stepCounter == this.options.startScreen.selectedCells * this.options.startScreen.selectedCells) && vm.result == '' ){
+                alert('friendship WON!');
+                vm.restart();
+            }
+            if(this.result == 'x'|| this.result == 'o'){
+                this.showResult(vm.result);
+            }
+        
+        };        
+
 
 		function action() {
 			if (this.nodeName == 'DIV') {
@@ -120,12 +233,27 @@
 				vm.gameField[blockPositionX][blockPositionY].value = this.innerHTML;
 				this.onclick = null;
 				vm.checkGame();
+				console.log(vm);
 
 			}
+			function step() {
+				if (vm.options.playerStep == 1) {
+					vm.options.playerStep = 2;
+					vm.options.turnStatusInfo.style.color = 'blue';
+					return 'x';
+				} else {
+					vm.options.playerStep = 1;
+					vm.options.turnStatusInfo.style.color = 'red';
+					return 'o';
+				}
+			};
   		
         }
 
-        console.log(vm);
+        // console.log(vm);
+        console.log(vm.options.startScreen.selectedWin);
+        
+
 	}
 	var game = new Game();
 
