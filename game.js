@@ -153,7 +153,6 @@
                 var prevItem ;
                 for(var i = 0; i <= vm.gameField.length - 1; i++){
                     vm.gameField[i].forEach(function (item,i,arr) {
-                    	// debugger;
                         if(item.value == player ) {
                             count++;
                             if (count ==vm.options.startScreen.selectedWin ){
