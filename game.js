@@ -124,8 +124,18 @@
             debugger;
             for(var i = 0; i <= vm.options.startScreen.selectedCells-1; i++){
                 vm.gameField.forEach(function (item) {
-                    if(item[i].value == player){
-                        count++
+                    if (item[i].value == player) {
+                        count++;
+                        if (count == vm.options.startScreen.selectedWin) {
+                            vm.result = player;
+                            return;
+                        }
+
+                    } else if (item[i].value == "") {
+                        count = 0;
+
+                    } else {
+                        count = 0;
                     }
                 });
                 if(count == vm.options.startScreen.selectedWin){
@@ -139,18 +149,23 @@
 
         };
         this.checkHorizontal = function (player) {
-        	 debugger;
                 var count = 0;
                 var prevItem ;
                 for(var i = 0; i <= vm.gameField.length - 1; i++){
                     vm.gameField[i].forEach(function (item,i,arr) {
-                    	
+                    	// debugger;
+                        if(item.value == player ) {
+                            count++;
+                            if (count ==vm.options.startScreen.selectedWin ){
+                               vm.result = player;
+                                return; 
+                            }    
+                            
+                        }else if (item.value == ""){
+                            count = 0;
 
-                    	if (i == 0){
-                    		prevItem = vm.gameField[i].value;
-                    	}
-                        if(item.value == player | prevItem == player) {
-                            count++
+                        }else{
+                            count = 0;
                         }
                     });
                     if(count == vm.options.startScreen.selectedWin){
