@@ -41,9 +41,12 @@
         this.fieldCreate = function () {
             var Cells = this.options.startScreen.selectedCells;
             var container = this.elementFactory(document.body,'div');
+            container.className = 'main';
             container.style.width = Cells * 80 + 'px';
             container.style.height = Cells * 80 + 'px';
             container.style.margin = 'auto';
+            container.style.display = 'flex';
+            container.style.flexWrap = 'wrap';
             for( var j = 0; j <= Cells - 1; j++ ){
                 var line = [];
                 for ( var i = 0; i <= Cells - 1; i++ ){
@@ -72,6 +75,8 @@
         };
 
         this.createStartScreen = function(){
+            // document.body.style.display = "flex";
+            // document.body.style.flexWrap = "wrap";
             document.body.style.textAlign = 'center';
             document.body.style.marginTop = '80px';
             this.options.startScreen.topic = this.elementFactory(document.body,'h1');
@@ -121,7 +126,7 @@
         this.createStartScreen();
         this.checkVertical = function (player) {
             var count = 0;
-            debugger;
+            // debugger;
             for(var i = 0; i <= vm.options.startScreen.selectedCells-1; i++){
                 vm.gameField.forEach(function (item) {
                     if (item[i].value == player) {
@@ -183,7 +188,16 @@
                     rightDiagonal.push(vm.gameField[i].slice());
                     rightDiagonal[i].reverse();
                     if(rightDiagonal[i][i].value == player){
-                        rightDiagonalCount++
+                        rightDiagonalCount++;
+                        if (rightDiagonalCount ==vm.options.startScreen.selectedWin ){
+                               vm.result = player;
+                               rightDiagonalCount = 0;
+                                return; 
+                            }  
+                    } else if (rightDiagonal[i][i].value == '') {
+                        rightDiagonalCount = 0;
+                    }else {
+                        rightDiagonalCount = 0;
                     }
                     if(rightDiagonalCount == vm.options.startScreen.selectedWin){
 
@@ -199,8 +213,17 @@
 
 			for (var i = 0; i <= leftDiagonal.length - 1; i++) {
 				if (leftDiagonal[i][i].value == player) {
-					leftDiagonalCount++
-				}
+					leftDiagonalCount++;
+                    if (leftDiagonalCount == vm.options.startScreen.selectedWin) {
+                        vm.result = player;
+                        leftDiagonalCount = 0;
+                        return;
+                    }
+				} else if (leftDiagonal[i][i].value == '') {
+                        leftDiagonalCount = 0;
+                    }else {
+                        leftDiagonalCount = 0;
+                    }
 				if (leftDiagonalCount == vm.options.startScreen.selectedWin) {
 
 					vm.result = player;
